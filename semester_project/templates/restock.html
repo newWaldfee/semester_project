@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Restock Medication</h1>
+<form method="POST">
+    <div class="form-group">
+        <label for="name">Medication Name</label>
+        <input type="text" class="form-control" id="name" name="name" required>
+    </div>
+    <div class="form-group">
+        <label for="restock">Restock Amount</label>
+        <input type="number" class="form-control" id="restock" name="restock" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Restock</button>
+</form>
+{% endblock %}
