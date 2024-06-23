@@ -5,7 +5,11 @@
 <form method="POST">
     <div class="form-group">
         <label for="name">Medication Name</label>
-        <input type="text" class="form-control" id="name" name="name" required>
+        <select class="form-control" id="name" name="name" required>
+            {% for name in medication_names %}
+            <option value="{{ name }}">{{ name }}</option>
+            {% endfor %}
+        </select>
     </div>
     <div class="form-group">
         <label for="taken">Amount Taken</label>

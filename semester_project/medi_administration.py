@@ -37,7 +37,7 @@ def update_stock():
         if name in medications and medications[name]['stock'] >= taken:
             medications[name]['stock'] -= taken
         return redirect(url_for('index'))
-    return render_template('update_medication.html')
+    return render_template('update_stock.html', medication_names=medications.keys())
 
 
 @app.route('/restock', methods=['GET', 'POST'])
@@ -48,7 +48,7 @@ def restock():
         if name in medications:
             medications[name]['stock'] += restock_amount
         return redirect(url_for('index'))
-    return render_template('restock.html')
+    return render_template('restock.html', medication_names=medications.keys())
 
 
 @app.route('/info', methods=['GET', 'POST'])
