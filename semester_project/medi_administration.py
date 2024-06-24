@@ -54,11 +54,12 @@ def restock():
 @app.route('/info', methods=['GET', 'POST'])
 def medication_info():
     info = None
+    selected_medi = None
     if request.method == 'POST':
-        name = request.form['name']
-        if name in medications:
-            info = medications[name]
-    return render_template('home.html', medications=medications, info=info)
+        selected_medi = request.form['name']
+        if selected_medi in medications:
+            info = medications[selected_medi]
+    return render_template('info.html', medication_names=medications.keys(), info=info, selected_medi=selected_medi)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Get Medication Info</h1>
+<form method="POST">
+    <div class="form-group">
+        <label for="name">Medication Name</label>
+        <select class="form-control" id="name" name="name" required>
+            {% for name in medication_names %}
+            <option value="{{ name }}" {% if name == selected_medi %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Get Info</button>
+</form>
+
+{% if info %}
+<h2>Information for {{ selected_medi }}</h2>
+<ul>
+    <li>Dosage: {{ info['dosage'] }}</li>
+    <li>Stock: {{ info['stock'] }}</li>
+    <li>Manufacturer: {{ info['manufacturer'] }}</li>
+</ul>
+{% endif %}
+{% endblock %}
