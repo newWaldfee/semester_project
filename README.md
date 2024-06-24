@@ -1,0 +1,1 @@
+This repository contains my semester-end project in the subject Advanced Programming Concepts. It is a web application using flask in Python that is intended to enable the management of medication stocks in hospitals or doctor's offices.
