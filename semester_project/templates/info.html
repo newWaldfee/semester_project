@@ -16,10 +16,23 @@
 
 {% if info %}
 <h2>Information for {{ selected_medi }}</h2>
-<ul>
-    <li>Dosage: {{ info['dosage'] }}</li>
-    <li>Stock: {{ info['stock'] }}</li>
-    <li>Manufacturer: {{ info['manufacturer'] }}</li>
-</ul>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Dosage</th>
+            <th>Stock</th>
+            <th>Manufacturer</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{ selected_medi }}</td>
+            <td>{{ info['dosage'] }}</td>
+            <td>{{ info['stock'] }}</td>
+            <td>{{ info['manufacturer'] }}</td>
+        </tr>
+    </tbody>
+</table>
 {% endif %}
 {% endblock %}

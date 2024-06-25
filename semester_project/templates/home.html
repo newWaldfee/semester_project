@@ -2,17 +2,24 @@
 
 {% block content %}
 <h1>Medications</h1>
-<ul>
-    {% for name, details in medications.items() %}
-    <li>{{ name }}: {{ details['dosage'] }} - Stock: {{ details['stock'] }} - Manufacturer: {{ details['manufacturer'] }}</li>
-    {% endfor %}
-</ul>
-
-{% if info %}
-<h2>Information</h2>
-<p>Name: {{ request.form['name'] }}</p>
-<p>Dosage: {{ info['dosage'] }}</p>
-<p>Stock: {{ info['stock'] }}</p>
-<p>Manufacturer: {{ info['manufacturer'] }}</p>
-{% endif %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Dosage</th>
+            <th>Stock</th>
+            <th>Manufacturer</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for name, details in medications.items() %}
+        <tr>
+            <td>{{name }}</td>
+            <td>{{details['dosage'] }}</td>
+            <td>{{details['stock'] }}</td>
+            <td>{{details['manufacturer'] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
