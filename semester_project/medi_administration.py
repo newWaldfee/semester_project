@@ -1,4 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, Response
+import matplotlib.pyplot as plt
+import io
+
 
 app = Flask(__name__)
 
@@ -62,5 +65,31 @@ def medication_info():
     return render_template('info.html', medication_names=medications.keys(), info=info, selected_medi=selected_medi)
 
 
+@app.route('/statistics')
+def statistics():
+    medication_stock_count = {name: info['stock'] for name, info in medications.items()}
+    return render_template('statistics.html', medication_stock_count=medication_stock_count)
+
+
+@app.route('/plot.png')
+def plot_png():
+    medication_stock_count = {name: details['stock'] for name, details in medications.items()}
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    ax.bar(medication_stock_count.keys(), medication_stock_count.values(), color='mediumturquoise', alpha=0.7)
+    ax.set_facecolor('whitesmoke')
+    ax.set_xlabel('Medications', fontsize=14)
+    ax.set_ylabel('Stock', fontsize=14)
+    ax.set_title('Medication Stock Overview', fontsize=14)
+    ax.grid(True, which='both', linestyle='--', linewidth=0.7, color='teal', alpha=0.7)
+
+    plt.tight_layout()
+    img = io.BytesIO()
+    fig.savefig(img, format='png')
+    img.seek(0)
+    return Response(img.getvalue(), mimetype='image/png')
+
+
 if __name__ == '__main__':
+    plt.style.use('ggplot')
     app.run(debug=True)
