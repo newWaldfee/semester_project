@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, Response
+from flask import Flask, render_template, request, redirect, url_for, Response, flash
 import matplotlib.pyplot as plt
 import io
 
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'randomnumbersandletters'
 
 # Initial data
 medications = {
@@ -37,8 +38,14 @@ def update_stock():
     if request.method == 'POST':
         name = request.form['name']
         taken = int(request.form['taken'])
-        if name in medications and medications[name]['stock'] >= taken:
-            medications[name]['stock'] -= taken
+        if name in medications:
+            if medications[name]['stock'] >= taken:
+                medications[name]['stock'] -= taken
+                flash(f"Stock of {name} updated successfully!", "success")
+            else:
+                flash(f"Not enough stock for {name}!", "danger")
+        else:
+            flash(f"Medication {name} not found!", "danger")
         return redirect(url_for('index'))
     return render_template('update_stock.html', medication_names=medications.keys())
 
@@ -50,6 +57,7 @@ def restock():
         restock_amount = int(request.form['restock'])
         if name in medications:
             medications[name]['stock'] += restock_amount
+            flash(f"Restock of {name} successfully!", "success")
         return redirect(url_for('index'))
     return render_template('restock.html', medication_names=medications.keys())
 
