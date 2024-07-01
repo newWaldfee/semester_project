@@ -3,4 +3,28 @@
 {% block content %}
 <h1>Medication Statistics</h1>
 <img src="{{ url_for('plot_png') }}" alt="Medication Overview Chart">
+
+<h2>Activity Log</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Action</th>
+            <th>Medication</th>
+            <th>Amount</th>
+            <th>Timestamp</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for activity in activity_log %}
+        <tr>
+            <td>{{ activity.name }}</td>
+            <td>{{ activity.action }}</td>
+            <td>{{ activity.medication_name }}</td>
+            <td>{{ activity.amount }}</td>
+            <td>{{ activity.timestamp }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

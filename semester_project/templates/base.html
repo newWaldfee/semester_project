@@ -8,17 +8,29 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{{ url_for('index') }}">Medications</a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('add_medication') }}">Add Medication</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('update_stock') }}">Update Stock</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('restock') }}">Restock</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('medication_info') }}">Get Info</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('statistics') }}">Statistics</a></li>
-            </ul>
-        </div>
-    </nav>
+    <a class="navbar-brand" href="{{ url_for('index') }}">Medications</a>
+    <div class="collapse navbar-collapse">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('add_medication') }}">Add Medication</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('update_stock') }}">Update Stock</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('restock') }}">Restock</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('medication_info') }}">Get Info</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('statistics') }}">Statistics</a></li>
+            {% if not request.cookies.get('token') %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">Register</a></li>
+            {% else %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
+            <li class="nav-item">
+                    <span class="nav-link">
+                        {% set data = request.cookies.get('token') | decode_token %}
+                        Logged in as {{ data.name }}
+                    </span>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
     <div class="container mt-3">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}

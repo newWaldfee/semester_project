@@ -1,12 +1,47 @@
 from flask import Flask, render_template, request, redirect, url_for, Response, flash
 import matplotlib.pyplot as plt
 import io
+from werkzeug.security import generate_password_hash, check_password_hash
+import jwt
+from functools import wraps
+import base64
+import json
+import time
+
+
+def decode_token(token):
+    try:
+        payload = token.split('.')[1]
+        missing_padding = len(payload) % 4
+        if missing_padding:
+            payload += '=' * (4 - missing_padding)
+        decoded = base64.urlsafe_b64decode(payload)
+        return json.loads(decoded)
+    except Exception as e:
+        return {}
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'randomnumbersandletters'
 
-# Initial data
+app.jinja_env.filters['decode_token'] = decode_token
+
+users = {}
+hospital_key = "secret_hospital_key"
+activity_log = []
+
+
+def log_activity(user, action, medication_name=None, amount=None):
+    activity = {
+        'name': user['name'],
+        'action': action,
+        'medication_name': medication_name,
+        'amount': amount,
+        'timestamp': time.strftime('%Y-%m-%d %H:%M:%S')
+    }
+    activity_log.append(activity)
+
+
 medications = {
     "Metformin": {"dosage": "500mg", "stock": 100, "manufacturer": "Bristol-Myers Squibb (Glucophage)"},
     "Lisinopril": {"dosage": "10mg", "stock": 50, "manufacturer": "AstraZeneca"},
@@ -16,31 +51,101 @@ medications = {
 }
 
 
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.cookies.get('token')
+        if not token:
+            flash('Please log in to access this page', 'warning')
+            return redirect(url_for('login'))
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+            current_user = users[data['email']]
+            current_user['name'] = data['name']
+        except:
+            return redirect(url_for('login'))
+        return f(current_user, *args, **kwargs)
+
+    return decorated
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        hospital_key_input = request.form['hospital_key']
+
+        if hospital_key_input != hospital_key:
+            flash('Invalid hospital key', 'danger')
+            return redirect(url_for('register'))
+
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+        users[email] = {'name': name, 'password': hashed_password}
+        flash('Successfully registered! You can now login.', 'success')
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = users.get(email)
+
+        if user and check_password_hash(user['password'], password):
+            token = jwt.encode({
+                'email': email,
+                'name': user['name'],
+            }, app.config['SECRET_KEY'], algorithm="HS256")
+
+            response = redirect(url_for('index'))
+            response.set_cookie('token', token, httponly=True, secure=True)
+            return response
+        else:
+            flash('Invalid login data', 'danger')
+            return redirect(url_for('login'))
+    return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    response = redirect(url_for('index'))
+    response.delete_cookie('token')
+    return response
+
+
 @app.route('/')
 def index():
     return render_template('home.html', medications=medications)
 
 
 @app.route('/add', methods=['GET', 'POST'])
-def add_medication():
+@token_required
+def add_medication(current_user):
     if request.method == 'POST':
         name = request.form['name']
         dosage = request.form['dosage']
         stock = int(request.form['stock'])
         manufacturer = request.form['manufacturer']
         medications[name] = {"dosage": dosage, "stock": stock, "manufacturer": manufacturer}
+        log_activity(current_user, 'add_medication', name, stock)
         return redirect(url_for('index'))
     return render_template('add_medication.html')
 
 
 @app.route('/update', methods=['GET', 'POST'])
-def update_stock():
+@token_required
+def update_stock(current_user):
     if request.method == 'POST':
         name = request.form['name']
         taken = int(request.form['taken'])
         if name in medications:
             if medications[name]['stock'] >= taken:
                 medications[name]['stock'] -= taken
+                log_activity(current_user, 'update_stock', name, taken)
                 flash(f"Stock of {name} updated successfully!", "success")
             else:
                 flash(f"Not enough stock for {name}!", "danger")
@@ -51,12 +156,14 @@ def update_stock():
 
 
 @app.route('/restock', methods=['GET', 'POST'])
-def restock():
+@token_required
+def restock(current_user):
     if request.method == 'POST':
         name = request.form['name']
         restock_amount = int(request.form['restock'])
         if name in medications:
             medications[name]['stock'] += restock_amount
+            log_activity(current_user, 'restock', name, restock_amount)
             flash(f"Restock of {name} successfully!", "success")
         return redirect(url_for('index'))
     return render_template('restock.html', medication_names=medications.keys())
@@ -74,9 +181,10 @@ def medication_info():
 
 
 @app.route('/statistics')
-def statistics():
+@token_required
+def statistics(current_user):
     medication_stock_count = {name: info['stock'] for name, info in medications.items()}
-    return render_template('statistics.html', medication_stock_count=medication_stock_count)
+    return render_template('statistics.html', medication_stock_count=medication_stock_count, activity_log=activity_log)
 
 
 @app.route('/plot.png')
