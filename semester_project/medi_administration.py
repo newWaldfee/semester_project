@@ -7,6 +7,7 @@ from functools import wraps
 import base64
 import json
 import time
+from dicts import patients, medications
 
 
 def decode_token(token):
@@ -40,15 +41,6 @@ def log_activity(user, action, medication_name=None, amount=None):
         'timestamp': time.strftime('%Y-%m-%d %H:%M:%S')
     }
     activity_log.append(activity)
-
-
-medications = {
-    "Metformin": {"dosage": "500mg", "stock": 100, "manufacturer": "Bristol-Myers Squibb (Glucophage)"},
-    "Lisinopril": {"dosage": "10mg", "stock": 50, "manufacturer": "AstraZeneca"},
-    "Aspirin": {"dosage": "500mg", "stock": 50, "manufacturer": "Bayer, St. Joseph, Ecotrin"},
-    "Ibuprofen": {"dosage": "400mg", "stock": 50, "manufacturer": "Advil (Pfizer)"},
-    "Paracetamol": {"dosage": "500mg", "stock": 50, "manufacturer": "Tylenol (Johnson & Johnson)"}
-}
 
 
 def token_required(f):
@@ -204,6 +196,42 @@ def plot_png():
     fig.savefig(img, format='png')
     img.seek(0)
     return Response(img.getvalue(), mimetype='image/png')
+
+
+@app.route('/patients')
+@token_required
+def patients_overview(current_user):
+    return render_template('patients_overview.html', patients=patients)
+
+
+@app.route('/patient/<patient_id>')
+@token_required
+def patient_record(current_user, patient_id):
+    patient = patients.get(patient_id)
+    if not patient:
+        flash('Patient not found', 'danger')
+        return redirect(url_for('patients_overview'))
+    return render_template('patient_record.html', patient=patient, patient_id=patient_id)
+
+
+@app.route('/update_patient_medications/<patient_id>', methods=['POST'])
+@token_required
+def update_patient_medications(current_user, patient_id):
+    patient = patients.get(patient_id)
+    if not patient:
+        flash('Patient not found', 'danger')
+        return redirect(url_for('patients_overview'))
+
+    needed_medications = patient['needed_medications']
+    for med, amount in needed_medications.items():
+        if med in medications and medications[med]['stock'] >= amount:
+            medications[med]['stock'] -= amount
+            log_activity(current_user, 'update_patient_medications', med, amount)
+        else:
+            flash(f"Not enough stock for {med}", "danger")
+
+    flash('Medications updated for patient', 'success')
+    return redirect(url_for('patient_record', patient_id=patient_id))
 
 
 if __name__ == '__main__':

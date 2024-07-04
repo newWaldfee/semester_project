@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Patients Overview</h1>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Room Number</th>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for patient_id, patient in patients.items() %}
+        <tr>
+            <td>{{ patient.room_number }}</td>
+            <td><a href="{{ url_for('patient_record', patient_id=patient_id) }}">{{ patient.name }}</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

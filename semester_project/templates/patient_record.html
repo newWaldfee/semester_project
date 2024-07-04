@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Patient Record: {{ patient.name }}</h1>
+<table class="table table-striped">
+    <tr>
+        <th>Name</th>
+        <td>{{ patient.name }}</td>
+    </tr>
+    <tr>
+        <th>Arrival Date</th>
+        <td>{{ patient.arrival_date }}</td>
+    </tr>
+    <tr>
+        <th>Departure Date</th>
+        <td>{{ patient.departure_date }}</td>
+    </tr>
+    <tr>
+        <th>Room Number</th>
+        <td>{{ patient.room_number }}</td>
+    </tr>
+    <tr>
+        <th>Diagnosis</th>
+        <td>{{ patient.diagnosis }}</td>
+    </tr>
+    <tr>
+        <th>Needed Medications</th>
+        <td>
+            <ul>
+                {% for med, amount in patient.needed_medications.items() %}
+                <li>{{ med }} ({{ amount }})</li>
+                {% endfor %}
+            </ul>
+            <form method="POST" action="{{ url_for('update_patient_medications', patient_id=patient_id) }}">
+                <button type="submit" class="btn btn-primary">Update Medication Stock</button>
+            </form>
+        </td>
+    </tr>
+</table>
+{% endblock %}

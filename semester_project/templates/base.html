@@ -20,6 +20,12 @@
     <div class="collapse navbar-collapse">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('patients_overview') }}">
+                        <img src="{{ url_for('static', filename='img/AdobeStock_571403482.png') }}" alt="Icon" width="30" height="30" class="d-inline-block align-top">
+                        Patients
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('add_medication') }}">
                         <img src="{{ url_for('static', filename='img/AdobeStock_546567744.png') }}" alt="Icon" width="30" height="30" class="d-inline-block align-top">
                         Add Medication
