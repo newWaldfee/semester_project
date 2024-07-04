@@ -5,31 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medications App</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+   <style>
+        .navbar-nav .nav-item {
+            margin-right: 20px;
+        }
+   </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="{{ url_for('index') }}">Medications</a>
+    <a class="navbar-brand" href="{{ url_for('index') }}">
+            <img src="{{ url_for('static', filename='img/AdobeStock_295692755.png') }}" alt="Logo" width="30" height="30" class="d-inline-block align-top">
+            Medications
+    </a>
     <div class="collapse navbar-collapse">
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('add_medication') }}">Add Medication</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('update_stock') }}">Update Stock</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('restock') }}">Restock</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('medication_info') }}">Get Info</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('statistics') }}">Statistics</a></li>
-            {% if not request.cookies.get('token') %}
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">Register</a></li>
-            {% else %}
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
-            <li class="nav-item">
-                    <span class="nav-link">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('add_medication') }}">
+                        <img src="{{ url_for('static', filename='img/AdobeStock_546567744.png') }}" alt="Icon" width="30" height="30" class="d-inline-block align-top">
+                        Add Medication
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('update_stock') }}">
+                        <img src="{{ url_for('static', filename='img/AdobeStock_483897986.png') }}" alt="Icon" width="30" height="30" class="d-inline-block align-top">
+                        Update Stock
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('restock') }}">
+                        <img src="{{ url_for('static', filename='img/AdobeStock_467499836.png') }}" alt="Icon" width="30" height="30" class="d-inline-block align-top">
+                        Restock
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('medication_info') }}">
+                        <img src="{{ url_for('static', filename='img/AdobeStock_438770043.png') }}" alt="Icon" width="30" height="30" class="d-inline-block align-top">
+                        Get Info
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('statistics') }}">
+                        <img src="{{ url_for('static', filename='img/AdobeStock_227041742.png') }}" alt="Icon" width="30" height="30" class="d-inline-block align-top">
+                        Statistics
+                    </a>
+                </li>
+                {% if not request.cookies.get('token') %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('login') }}">
+                        <img src="{{ url_for('static', filename='img/AdobeStock_227490073.png') }}" alt="Icon" width="30" height="30" class="d-inline-block align-top">
+                        Login
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('register') }}">
+                        <img src="{{ url_for('static', filename='img/AdobeStock_575212987.png') }}" alt="Icon" width="30" height="30" class="d-inline-block align-top">
+                        Register
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">
+                        <img src="{{ url_for('static', filename='img/AdobeStock_581712158.png') }}" alt="Icon" width="30" height="30" class="d-inline-block align-top">
+                        Logout
+                    </a>
+                </li>
+                <li class="nav-item">
                         {% set data = request.cookies.get('token') | decode_token %}
                         Logged in as {{ data.name }}
-                    </span>
                 </li>
-            {% endif %}
-        </ul>
-    </div>
+                {% endif %}
+            </ul>
+        </div>
 </nav>
     <div class="container mt-3">
         {% with messages = get_flashed_messages(with_categories=true) %}
