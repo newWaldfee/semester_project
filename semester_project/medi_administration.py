@@ -218,9 +218,6 @@ def patient_record(current_user, patient_id):
 @token_required
 def update_patient_medications(current_user, patient_id):
     patient = patients.get(patient_id)
-    if not patient:
-        flash('Patient not found', 'danger')
-        return redirect(url_for('patients_overview'))
 
     needed_medications = patient['needed_medications']
     for med, amount in needed_medications.items():
